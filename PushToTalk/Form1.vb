@@ -17,6 +17,7 @@ Public Class Form1
     Private Const WM_KEYUP As Integer = &H101
 
     ' Choose your push-to-talk key (you can change this)
+    <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
     Private ReadOnly PttKeys As Keys() = {Keys.LControlKey, Keys.RControlKey}
 
     ' KBDLLHOOKSTRUCT for WH_KEYBOARD_LL
@@ -47,6 +48,7 @@ Public Class Form1
     Private Shared Function GetModuleHandle(lpModuleName As String) As IntPtr
     End Function
 
+    <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
     Private Function LowLevelKeyboardProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
         If nCode >= 0 Then
             Dim data = Marshal.PtrToStructure(Of KBDLLHOOKSTRUCT)(lParam)
@@ -66,7 +68,6 @@ Public Class Form1
                             'NotifyIcon1.Visible = False
                             'NotifyIcon1.Icon = My.Resources.Talk
                             'NotifyIcon1.Visible = True
-
 
                             NotifyIcon1.Text = "Microphone: ACTIVE (PTT held)"
 
@@ -101,6 +102,8 @@ Public Class Form1
     End Function
 
 
+    ' Add the SupportedOSPlatform attribute to the Form1_Load method to suppress CA1416
+    <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         ' Pick audio device
@@ -120,7 +123,7 @@ Public Class Form1
         hookProc,
         GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName),
         0
-    )
+)
 
         Label1.ForeColor = Color.Red
         Label1.Text = "Muted (hold Ctrl to talk)"
