@@ -26,6 +26,7 @@ Partial Class Form1
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         NotifyIcon1 = New NotifyIcon(components)
         PictureBox1 = New PictureBox()
+        Label1 = New Label()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -36,7 +37,6 @@ Partial Class Form1
         ' 
         ' PictureBox1
         ' 
-        PictureBox1.Image = My.Resources.Resources.Mic_Red
         PictureBox1.Location = New Point(12, 12)
         PictureBox1.Name = "PictureBox1"
         PictureBox1.Size = New Size(150, 131)
@@ -44,11 +44,21 @@ Partial Class Form1
         PictureBox1.TabIndex = 0
         PictureBox1.TabStop = False
         ' 
+        ' Label1
+        ' 
+        Label1.AutoSize = True
+        Label1.Location = New Point(244, 12)
+        Label1.Name = "Label1"
+        Label1.Size = New Size(41, 15)
+        Label1.TabIndex = 1
+        Label1.Text = "Label1"
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(177, 156)
+        ClientSize = New Size(176, 157)
+        Controls.Add(Label1)
         Controls.Add(PictureBox1)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         MaximizeBox = False
@@ -57,9 +67,11 @@ Partial Class Form1
         Text = "PTT"
         CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
+        PerformLayout()
     End Sub
 
     Friend WithEvents NotifyIcon1 As NotifyIcon
     Friend WithEvents PictureBox1 As PictureBox
+    Friend WithEvents Label1 As Label
 
 End Class

@@ -1,5 +1,4 @@
-﻿
-Imports System.Diagnostics
+﻿Imports System.Diagnostics
 Imports System.Runtime.InteropServices
 Imports NAudio.CoreAudioApi
 Imports Windows.Win32.System
@@ -19,7 +18,6 @@ Public Class Form1
 
     ' Choose your push-to-talk key (you can change this)
     Private ReadOnly PttKeys As Keys() = {Keys.LControlKey, Keys.RControlKey}
-    'Private ReadOnly PttKeys As Keys() = {Keys.LeftControl, Keys.RightControl}
 
     ' KBDLLHOOKSTRUCT for WH_KEYBOARD_LL
     <StructLayout(LayoutKind.Sequential)>
@@ -61,11 +59,15 @@ Public Class Form1
                         SetMicMute(False)
                         isTalking = True
                         Try
-                            'Label1.ForeColor = System.Drawing.Color.Green
-                            'Me.BeginInvoke(Sub() Label1.Text = "Talking… (hold Ctrl)")
+                            Label1.ForeColor = System.Drawing.Color.Green
+                            Me.BeginInvoke(Sub() Label1.Text = "Talking… (hold Ctrl)")
                             PictureBox1.Image = My.Resources.Mic_Green
 
+                            'NotifyIcon1.Visible = False
                             'NotifyIcon1.Icon = My.Resources.Talk
+                            'NotifyIcon1.Visible = True
+
+
                             NotifyIcon1.Text = "Microphone: ACTIVE (PTT held)"
 
                         Catch
@@ -78,11 +80,14 @@ Public Class Form1
                         SetMicMute(True)
                         isTalking = False
                         Try
-                            'Label1.ForeColor = System.Drawing.Color.Red
-                            'Me.BeginInvoke(Sub() Label1.Text = "Muted (hold Ctrl to talk)")
+                            Label1.ForeColor = System.Drawing.Color.Red
+                            Me.BeginInvoke(Sub() Label1.Text = "Muted (hold Ctrl to talk)")
                             PictureBox1.Image = My.Resources.Mic_Red
 
+                            'NotifyIcon1.Visible = False
                             'NotifyIcon1.Icon = My.Resources.Mute
+                            'NotifyIcon1.Visible = True
+
                             NotifyIcon1.Text = "Microphone: Muted (hold Ctrl to talk)"
 
 
@@ -95,38 +100,33 @@ Public Class Form1
         Return CallNextHookEx(hookId, nCode, wParam, lParam)
     End Function
 
+
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        'Setup Notify
-        NotifyIcon1.Visible = True
-        'NotifyIcon1.Icon = My.Resources.Mute  ' starting icon
-        NotifyIcon1.Text = "Push-to-Talk Mic Controller"
-
-
-
-        ' Pick the default capture device. You can choose Role.Communications for softphones,
-        ' or Role.Multimedia / Role.Console depending on your scenario.
+        ' Pick audio device
         Dim enumerator = New MMDeviceEnumerator()
-
-        ' Try Communications endpoint first (commonly used by Teams/Zoom)
         Try
-            mmDevice = enumerator.GetDefaultAudioEndpoint(Dataflow.Capture, Role.Communications)
+            mmDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Communications)
         Catch
-            ' Fallback to console role if communications default isn't set
-            mmDevice = enumerator.GetDefaultAudioEndpoint(Dataflow.Capture, Role.Console)
+            mmDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console)
         End Try
 
-        ' Start muted so it’s PTT by default
         SetMicMute(True)
 
-        ' Install global keyboard hook
-        hookProc = AddressOf LowLevelKeyboardProc ' Keep delegate alive
-        Dim hModule = GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName)
-        hookId = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hModule, 0)
-        'Label1.ForeColor = System.Drawing.Color.Red
-        'Label1.Text = "Muted (hold Ctrl to talk)"
+        ' === INSTALL KEYBOARD HOOK (YOU WERE MISSING THIS) ===
+        hookProc = AddressOf LowLevelKeyboardProc
+        hookId = SetWindowsHookEx(
+        WH_KEYBOARD_LL,
+        hookProc,
+        GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName),
+        0
+    )
+
+        Label1.ForeColor = Color.Red
+        Label1.Text = "Muted (hold Ctrl to talk)"
         PictureBox1.Image = My.Resources.Mic_Red
     End Sub
+
 
     Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If hookId <> IntPtr.Zero Then UnhookWindowsHookEx(hookId)
@@ -145,7 +145,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub Form1_Load_1(sender As Object, e As EventArgs) Handles MyBase.Load
 
-    End Sub
+
+
 End Class
