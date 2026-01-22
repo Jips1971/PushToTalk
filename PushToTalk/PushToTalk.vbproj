@@ -7,6 +7,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
     <ApplicationIcon>Icon_Mic_Blank.ico</ApplicationIcon>
+  <!-- AssemblyVersion: used for binding; usually keep Major.Minor.* stable -->
+  <AssemblyVersion>1.2.0</AssemblyVersion>
+
+
   </PropertyGroup>
 
   <ItemGroup>

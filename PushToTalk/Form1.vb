@@ -65,9 +65,9 @@ Public Class Form1
                             Me.BeginInvoke(Sub() Label1.Text = "Talking… (hold Ctrl)")
                             PictureBox1.Image = My.Resources.Mic_Green
 
-                            'NotifyIcon1.Visible = False
-                            'NotifyIcon1.Icon = My.Resources.Talk
-                            'NotifyIcon1.Visible = True
+                            NotifyIcon1.Visible = False
+                            NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Talk, Bitmap).GetHicon())
+                            NotifyIcon1.Visible = True
 
                             NotifyIcon1.Text = "Microphone: ACTIVE (PTT held)"
 
@@ -85,9 +85,10 @@ Public Class Form1
                             Me.BeginInvoke(Sub() Label1.Text = "Muted (hold Ctrl to talk)")
                             PictureBox1.Image = My.Resources.Mic_Red
 
-                            'NotifyIcon1.Visible = False
-                            'NotifyIcon1.Icon = My.Resources.Mute
-                            'NotifyIcon1.Visible = True
+                            NotifyIcon1.Visible = False
+                            NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
+
+                            NotifyIcon1.Visible = True
 
                             NotifyIcon1.Text = "Microphone: Muted (hold Ctrl to talk)"
 
@@ -105,7 +106,7 @@ Public Class Form1
     ' Add the SupportedOSPlatform attribute to the Form1_Load method to suppress CA1416
     <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        Label2.Text = "Version: " & My.Application.Info.Version.ToString()
         ' Pick audio device
         Dim enumerator = New MMDeviceEnumerator()
         Try

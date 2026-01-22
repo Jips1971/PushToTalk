@@ -27,6 +27,7 @@ Partial Class Form1
         NotifyIcon1 = New NotifyIcon(components)
         PictureBox1 = New PictureBox()
         Label1 = New Label()
+        Label2 = New Label()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -53,11 +54,21 @@ Partial Class Form1
         Label1.TabIndex = 1
         Label1.Text = "Label1"
         ' 
+        ' Label2
+        ' 
+        Label2.AutoSize = True
+        Label2.Location = New Point(12, 128)
+        Label2.Name = "Label2"
+        Label2.Size = New Size(41, 15)
+        Label2.TabIndex = 2
+        Label2.Text = "Label2"
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(176, 157)
+        Controls.Add(Label2)
         Controls.Add(Label1)
         Controls.Add(PictureBox1)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
@@ -73,5 +84,6 @@ Partial Class Form1
     Friend WithEvents NotifyIcon1 As NotifyIcon
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents Label1 As Label
+    Friend WithEvents Label2 As Label
 
 End Class
