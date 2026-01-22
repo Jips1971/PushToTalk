@@ -7,6 +7,14 @@ Public Class Form1
     ' ===== CoreAudio (system mic) =====
     Private mmDevice As MMDevice
     Private isTalking As Boolean = False
+    Private _iconDefault As Icon
+    Private _iconTalk As Icon
+    Private _iconMute As Icon
+
+
+
+
+
 
     ' ===== Low-level keyboard hook =====
     Private hookId As IntPtr = IntPtr.Zero
@@ -64,12 +72,15 @@ Public Class Form1
                             Label1.ForeColor = System.Drawing.Color.Green
                             Me.BeginInvoke(Sub() Label1.Text = "Talking… (hold Ctrl)")
                             PictureBox1.Image = My.Resources.Mic_Green
-
+                            'Tray Icon Change
                             NotifyIcon1.Visible = False
                             NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Talk, Bitmap).GetHicon())
                             NotifyIcon1.Visible = True
-
                             NotifyIcon1.Text = "Microphone: ACTIVE (PTT held)"
+
+                            'TaskBar Icon Change
+                            Me.Icon = _iconTalk
+
 
                         Catch
                         End Try
@@ -84,14 +95,14 @@ Public Class Form1
                             Label1.ForeColor = System.Drawing.Color.Red
                             Me.BeginInvoke(Sub() Label1.Text = "Muted (hold Ctrl to talk)")
                             PictureBox1.Image = My.Resources.Mic_Red
-
+                            'Tray Icon Change
                             NotifyIcon1.Visible = False
                             NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
-
                             NotifyIcon1.Visible = True
-
                             NotifyIcon1.Text = "Microphone: Muted (hold Ctrl to talk)"
 
+                            'TaskBar Icon Change
+                            Me.Icon = _iconMute
 
                         Catch
                         End Try
@@ -107,6 +118,13 @@ Public Class Form1
     <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Label2.Text = "Version: " & My.Application.Info.Version.ToString()
+        _iconDefault = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
+        _iconTalk = Icon.FromHandle(CType(My.Resources.Talk, Bitmap).GetHicon())
+        _iconMute = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
+
+
+
+
         ' Pick audio device
         Dim enumerator = New MMDeviceEnumerator()
         Try
@@ -129,6 +147,7 @@ Public Class Form1
         Label1.ForeColor = Color.Red
         Label1.Text = "Muted (hold Ctrl to talk)"
         PictureBox1.Image = My.Resources.Mic_Red
+        Me.Icon = _iconMute
     End Sub
 
 
