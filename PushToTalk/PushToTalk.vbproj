@@ -9,22 +9,41 @@
     <ApplicationIcon>Icon_Mic_Blank.ico</ApplicationIcon>
   <!-- AssemblyVersion: used for binding; usually keep Major.Minor.* stable -->
   <AssemblyVersion>2.1.0</AssemblyVersion>
-
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <ImportedNamespaces>System.Data=False,System.Drawing=False,System.IO=False,System.IO.Ports=False,System.Windows.Forms=False,Microsoft.VisualBasic=True,System=True,System.Collections=True,System.Collections.Generic=True,System.Diagnostics=True,System.Linq=True,System.Xml.Linq=True,System.Threading.Tasks=True,PushToTalk=True</ImportedNamespaces>
 
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Mute.ico" />
+    <None Remove="Resources\Talk.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Icon_Mic_Blank.ico" />
+	
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Mute.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Talk.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
+    <Import Include="System.IO" />
+    <Import Include="System.IO.Ports" />
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="System.IO.Ports" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,6 +73,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Mute.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -62,6 +84,9 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Update="Talk.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
