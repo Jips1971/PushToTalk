@@ -24,60 +24,54 @@ Partial Class PortSelect
     Private Sub InitializeComponent()
         Label1 = New Label()
         Button1 = New Button()
-        TextBox1 = New TextBox()
+        ComboBoxPorts = New ComboBox()
         SuspendLayout()
         ' 
         ' Label1
         ' 
         Label1.AutoSize = True
-        Label1.Enabled = False
-        Label1.Location = New Point(12, 9)
+        Label1.Location = New Point(22, 9)
         Label1.Name = "Label1"
         Label1.Size = New Size(101, 15)
         Label1.TabIndex = 0
         Label1.Text = "Choose Com Port"
-        Label1.Visible = False
+        Label1.TextAlign = ContentAlignment.MiddleCenter
         ' 
         ' Button1
         ' 
-        Button1.Enabled = False
-        Button1.Location = New Point(22, 56)
+        Button1.Location = New Point(35, 67)
         Button1.Name = "Button1"
         Button1.Size = New Size(75, 23)
         Button1.TabIndex = 1
         Button1.Text = "Save"
         Button1.UseVisualStyleBackColor = True
-        Button1.Visible = False
         ' 
-        ' TextBox1
+        ' ComboBoxPorts
         ' 
-        TextBox1.Enabled = False
-        TextBox1.Location = New Point(12, 27)
-        TextBox1.Name = "TextBox1"
-        TextBox1.Size = New Size(100, 23)
-        TextBox1.TabIndex = 2
-        TextBox1.Text = "14"
-        TextBox1.TextAlign = HorizontalAlignment.Center
-        TextBox1.Visible = False
+        ComboBoxPorts.FormattingEnabled = True
+        ComboBoxPorts.Location = New Point(12, 38)
+        ComboBoxPorts.Name = "ComboBoxPorts"
+        ComboBoxPorts.Size = New Size(121, 23)
+        ComboBoxPorts.TabIndex = 2
         ' 
         ' PortSelect
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(120, 92)
-        ControlBox = False
-        Controls.Add(TextBox1)
+        ClientSize = New Size(141, 113)
+        Controls.Add(ComboBoxPorts)
         Controls.Add(Button1)
         Controls.Add(Label1)
         MaximizeBox = False
         MinimizeBox = False
         Name = "PortSelect"
         Text = "PortSelect"
+        TopMost = True
         ResumeLayout(False)
         PerformLayout()
     End Sub
 
     Friend WithEvents Label1 As Label
     Friend WithEvents Button1 As Button
-    Friend WithEvents TextBox1 As TextBox
+    Friend WithEvents ComboBoxPorts As ComboBox
 End Class

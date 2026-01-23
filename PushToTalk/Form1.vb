@@ -5,6 +5,10 @@ Imports NAudio.CoreAudioApi
 Imports Windows.Win32.System
 
 Public Class Form1
+
+
+
+
     ' ===== CoreAudio (system mic) =====
     Private mmDevice As MMDevice
     Private isTalking As Boolean = False
@@ -52,6 +56,7 @@ Public Class Form1
 
     ' ===== SERIAL PORT =====
     Private WithEvents serialPort As New SerialPort
+    Public Property portValue As String
 
     ' ===== LOW-LEVEL KEYBOARD HOOK =====
     <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
@@ -127,6 +132,14 @@ Public Class Form1
     ' ===== FORM LOAD =====
     <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        If SelectedPortValue = "" Then
+            Dim p As New PortSelect()
+            p.ShowDialog()
+        End If
+
+        Button1.Text = SelectedPortValue
+
         Label2.Text = "Version: " & My.Application.Info.Version.ToString()
         _iconDefault = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
         _iconTalk = Icon.FromHandle(CType(My.Resources.Talk, Bitmap).GetHicon())
@@ -144,7 +157,7 @@ Public Class Form1
 
         ' ===== SERIAL PORT SETUP =====
         Try
-            serialPort.PortName = "COM14"  ' Replace with your Nano V3 COM port
+            serialPort.PortName = SelectedPortValue.ToString()  ' Replace with your Nano V3 COM port
             serialPort.BaudRate = 9600
             serialPort.Open()
         Catch ex As Exception
@@ -184,4 +197,25 @@ Public Class Form1
         End Try
     End Sub
 
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        Dim p As New PortSelect()
+        p.ShowDialog()
+        If p.ShowDialog() = DialogResult.OK Then
+            Button1.Text = SelectedPortValue
+            serialPort.PortName = SelectedPortValue
+        End If
+
+        Button1.Text = SelectedPortValue
+        If serialPort.IsOpen Then
+            serialPort.Close()
+        End If
+        Form1_Load(Me, EventArgs.Empty)
+
+
+
+
+
+
+    End Sub
 End Class
