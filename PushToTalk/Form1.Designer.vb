@@ -28,7 +28,6 @@ Partial Class Form1
         PictureBox1 = New PictureBox()
         Label1 = New Label()
         Label2 = New Label()
-        Button1 = New Button()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -64,21 +63,11 @@ Partial Class Form1
         Label2.TabIndex = 2
         Label2.Text = "Label2"
         ' 
-        ' Button1
-        ' 
-        Button1.Location = New Point(12, 3)
-        Button1.Name = "Button1"
-        Button1.Size = New Size(153, 23)
-        Button1.TabIndex = 3
-        Button1.Text = "Port"
-        Button1.UseVisualStyleBackColor = True
-        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(177, 162)
-        Controls.Add(Button1)
         Controls.Add(Label2)
         Controls.Add(Label1)
         Controls.Add(PictureBox1)
@@ -87,6 +76,7 @@ Partial Class Form1
         MinimizeBox = False
         Name = "Form1"
         Text = "PTT"
+        TopMost = True
         CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
@@ -96,6 +86,5 @@ Partial Class Form1
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
-    Friend WithEvents Button1 As Button
 
 End Class

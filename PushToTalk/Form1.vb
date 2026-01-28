@@ -1,13 +1,9 @@
-﻿Imports System.IO.Ports
-Imports System.Diagnostics
+﻿Imports System.Diagnostics
 Imports System.Runtime.InteropServices
 Imports NAudio.CoreAudioApi
 Imports Windows.Win32.System
 
 Public Class Form1
-
-
-
 
     ' ===== CoreAudio (system mic) =====
     Private mmDevice As MMDevice
@@ -15,6 +11,9 @@ Public Class Form1
     Private _iconDefault As Icon
     Private _iconTalk As Icon
     Private _iconMute As Icon
+
+    ' ===== Tray & minimize =====
+    Private startMinimized As Boolean = True
 
     ' ===== Low-level keyboard hook =====
     Private hookId As IntPtr = IntPtr.Zero
@@ -36,10 +35,19 @@ Public Class Form1
         Public dwExtraInfo As IntPtr
     End Structure
 
-    Private Delegate Function LowLevelKeyboardProcDelegate(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    Private Delegate Function LowLevelKeyboardProcDelegate(
+        nCode As Integer,
+        wParam As IntPtr,
+        lParam As IntPtr
+    ) As IntPtr
 
     <DllImport("user32.dll", SetLastError:=True)>
-    Private Shared Function SetWindowsHookEx(idHook As Integer, lpfn As LowLevelKeyboardProcDelegate, hMod As IntPtr, dwThreadId As UInteger) As IntPtr
+    Private Shared Function SetWindowsHookEx(
+        idHook As Integer,
+        lpfn As LowLevelKeyboardProcDelegate,
+        hMod As IntPtr,
+        dwThreadId As UInteger
+    ) As IntPtr
     End Function
 
     <DllImport("user32.dll", SetLastError:=True)>
@@ -47,20 +55,26 @@ Public Class Form1
     End Function
 
     <DllImport("user32.dll", SetLastError:=True)>
-    Private Shared Function CallNextHookEx(hhk As IntPtr, nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    Private Shared Function CallNextHookEx(
+        hhk As IntPtr,
+        nCode As Integer,
+        wParam As IntPtr,
+        lParam As IntPtr
+    ) As IntPtr
     End Function
 
     <DllImport("kernel32.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
     Private Shared Function GetModuleHandle(lpModuleName As String) As IntPtr
     End Function
 
-    ' ===== SERIAL PORT =====
-    Private WithEvents serialPort As New SerialPort
-    Public Property portValue As String
-
     ' ===== LOW-LEVEL KEYBOARD HOOK =====
     <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
-    Private Function LowLevelKeyboardProc(nCode As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    Private Function LowLevelKeyboardProc(
+        nCode As Integer,
+        wParam As IntPtr,
+        lParam As IntPtr
+    ) As IntPtr
+
         If nCode >= 0 Then
             Dim data = Marshal.PtrToStructure(Of KBDLLHOOKSTRUCT)(lParam)
             Dim key = CType(data.vkCode, Keys)
@@ -73,80 +87,63 @@ Public Class Form1
                 End If
             End If
         End If
+
         Return CallNextHookEx(hookId, nCode, wParam, lParam)
     End Function
 
-    ' ===== SERIAL EVENT HANDLER =====
-    Private Sub serialPort_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles serialPort.DataReceived
+    ' ===== PTT HELPERS =====
+    Private Sub PressPTT()
+        If isTalking Then Exit Sub
+
+        SetMicMute(False)
+        isTalking = True
+
         Try
-            Dim line As String = serialPort.ReadLine().Trim()
-            Me.Invoke(Sub()
-                          If line = "PRESSED" Then
-                              PressPTT()
-                          ElseIf line = "RELEASED" Then
-                              ReleasePTT()
-                          End If
-                      End Sub)
-        Catch ex As Exception
-            ' Ignore errors or log
+            Label1.ForeColor = Color.Green
+            Label1.Text = "Talking… (PTT active)"
+            PictureBox1.Image = My.Resources.Mic_Green
+
+            NotifyIcon1.Visible = True
+            NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Talk, Bitmap).GetHicon())
+            NotifyIcon1.Text = "Microphone: ACTIVE (PTT held)"
+
+            Me.Icon = _iconTalk
+        Catch
         End Try
     End Sub
 
-    ' ===== PTT HELPER FUNCTIONS =====
-    Private Sub PressPTT()
-        If Not isTalking Then
-            SetMicMute(False)
-            isTalking = True
-            Try
-                Label1.ForeColor = System.Drawing.Color.Green
-                Label1.Text = "Talking… (PTT active)"
-                PictureBox1.Image = My.Resources.Mic_Green
-                NotifyIcon1.Visible = False
-                NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Talk, Bitmap).GetHicon())
-                NotifyIcon1.Visible = True
-                NotifyIcon1.Text = "Microphone: ACTIVE (PTT held)"
-                Me.Icon = _iconTalk
-            Catch
-            End Try
-        End If
-    End Sub
-
     Private Sub ReleasePTT()
-        If isTalking Then
-            SetMicMute(True)
-            isTalking = False
-            Try
-                Label1.ForeColor = System.Drawing.Color.Red
-                Label1.Text = "Muted (PTT inactive)"
-                PictureBox1.Image = My.Resources.Mic_Red
-                NotifyIcon1.Visible = False
-                NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
-                NotifyIcon1.Visible = True
-                NotifyIcon1.Text = "Microphone: Muted (PTT inactive)"
-                Me.Icon = _iconMute
-            Catch
-            End Try
-        End If
+        If Not isTalking Then Exit Sub
+
+        SetMicMute(True)
+        isTalking = False
+
+        Try
+            Label1.ForeColor = Color.Red
+            Label1.Text = "Muted (PTT inactive)"
+            PictureBox1.Image = My.Resources.Mic_Red
+
+            NotifyIcon1.Visible = True
+            NotifyIcon1.Icon = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
+            NotifyIcon1.Text = "Microphone: Muted (PTT inactive)"
+
+            Me.Icon = _iconMute
+        Catch
+        End Try
     End Sub
 
     ' ===== FORM LOAD =====
     <Global.System.Runtime.Versioning.SupportedOSPlatform("windows6.1")>
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        If SelectedPortValue = "" Then
-            Dim p As New PortSelect()
-            p.ShowDialog()
-        End If
-
-        Button1.Text = SelectedPortValue
-
         Label2.Text = "Version: " & My.Application.Info.Version.ToString()
+
         _iconDefault = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
         _iconTalk = Icon.FromHandle(CType(My.Resources.Talk, Bitmap).GetHicon())
         _iconMute = Icon.FromHandle(CType(My.Resources.Mute, Bitmap).GetHicon())
 
         ' Pick audio device
-        Dim enumerator = New MMDeviceEnumerator()
+        Dim enumerator As New MMDeviceEnumerator()
         Try
             mmDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Communications)
         Catch
@@ -155,16 +152,7 @@ Public Class Form1
 
         SetMicMute(True)
 
-        ' ===== SERIAL PORT SETUP =====
-        Try
-            serialPort.PortName = SelectedPortValue.ToString()  ' Replace with your Nano V3 COM port
-            serialPort.BaudRate = 9600
-            serialPort.Open()
-        Catch ex As Exception
-            MessageBox.Show("Could not open serial port: " & ex.Message)
-        End Try
-
-        ' ===== KEYBOARD HOOK =====
+        ' Keyboard hook
         hookProc = AddressOf LowLevelKeyboardProc
         hookId = SetWindowsHookEx(
             WH_KEYBOARD_LL,
@@ -177,12 +165,39 @@ Public Class Form1
         Label1.Text = "Muted (PTT inactive)"
         PictureBox1.Image = My.Resources.Mic_Red
         Me.Icon = _iconMute
+
+        ' ===== Start minimized to tray =====
+        If startMinimized Then
+            Me.WindowState = FormWindowState.Minimized
+            Me.ShowInTaskbar = False
+
+            ' Assign default icon first
+            NotifyIcon1.Icon = _iconMute
+            NotifyIcon1.Text = "Microphone: Muted (PTT inactive)"
+            NotifyIcon1.Visible = True
+        End If
+    End Sub
+
+    ' ===== HANDLE MINIMIZE TO TRAY =====
+    Private Sub Form1_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        If Me.WindowState = FormWindowState.Minimized Then
+            Me.ShowInTaskbar = False
+            NotifyIcon1.Visible = True
+        End If
+    End Sub
+
+    ' ===== RESTORE WINDOW ON TRAY DOUBLE-CLICK =====
+    Private Sub NotifyIcon1_DoubleClick(sender As Object, e As EventArgs) Handles NotifyIcon1.DoubleClick
+        Me.Show()
+        Me.WindowState = FormWindowState.Normal
+        Me.ShowInTaskbar = True
+        Me.Activate()
     End Sub
 
     ' ===== FORM CLOSING =====
     Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If hookId <> IntPtr.Zero Then UnhookWindowsHookEx(hookId)
-        If serialPort IsNot Nothing AndAlso serialPort.IsOpen Then serialPort.Close()
+        NotifyIcon1.Visible = False
         SetMicMute(False)
     End Sub
 
@@ -192,30 +207,8 @@ Public Class Form1
             If mmDevice IsNot Nothing Then
                 mmDevice.AudioEndpointVolume.Mute = mute
             End If
-        Catch ex As Exception
-            ' Optional: log ex.Message
+        Catch
         End Try
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-
-        Dim p As New PortSelect()
-        p.ShowDialog()
-        If p.ShowDialog() = DialogResult.OK Then
-            Button1.Text = SelectedPortValue
-            serialPort.PortName = SelectedPortValue
-        End If
-
-        Button1.Text = SelectedPortValue
-        If serialPort.IsOpen Then
-            serialPort.Close()
-        End If
-        Form1_Load(Me, EventArgs.Empty)
-
-
-
-
-
-
-    End Sub
 End Class
